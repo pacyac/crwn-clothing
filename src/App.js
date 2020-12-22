@@ -1,5 +1,7 @@
 import React from "react";
 import { Route,Switch } from 'react-router-dom';
+import { connect } from 'react-redux';
+
 
 import './App.css';
 
@@ -8,31 +10,30 @@ import ShopPage from './pages/shop/shop.component.jsx';
 import SignInAndSignUpPage from "./pages/signin-and-signout-page/signin-and-signout-page.component";
 import Header from "./components/header/header.component";
 
+import { setCurrentUser } from './redux/user/user.actions';   
+
 import { auth,createUserProfile } from "./firebase/firebase.utilis";
 
 class App extends React.Component{
-  constructor(props){
-    super(props);
-    this.state ={
-      currentUser: null
-    }
-  }
 
   unsubscribeFromAuth = null;
 
   componentDidMount(){
+    console.log(this.props);
+    const {setCurrentUser} = this.props
+
     this.unsubscribeFromAuth = auth.onAuthStateChanged(async user => {
 
       if (user) {
         const userRef = await createUserProfile(user);
         
         userRef.onSnapshot(snapshot => {
-          this.setState({currentUser: {id: snapshot.id,...snapshot.data()}});
+          setCurrentUser({currentUser: {id: snapshot.id,...snapshot.data()}});
         })
 
-        console.log(this.state);
+        // console.log(this.state);
       }else{
-        this.setState({currentUser: user})
+        setCurrentUser({currentUser: user})
       }
       
       // this.setState({ currentUser: user   })
@@ -47,7 +48,7 @@ class App extends React.Component{
   render() {
     return (
       <div>
-        <Header currentUser={this.state.currentUser}/>  
+        <Header />  
         <Switch>
           <Route exact path="/" component={Homepage}/>
           <Route exact path="/shop" component={ShopPage}/>
@@ -58,9 +59,9 @@ class App extends React.Component{
   }
 }
 
-// function App() {
- 
-// }
+const mapDispatchToProps = dispatch => ({
+  setCurrentUser: user => dispatch(setCurrentUser(user))//dispatches plain object ie "SET_CURRENT_USER" to each reducer;
+})
 
-export default App;
+export default connect(null,mapDispatchToProps)(App);
 //<Homepage />

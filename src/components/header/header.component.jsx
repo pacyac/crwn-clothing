@@ -1,6 +1,9 @@
 import React from "react";
 
 import { Link } from "react-router-dom";
+import { connect } from 'react-redux';
+
+
 import { ReactComponent as Logo } from '../../assets/4.3 crown.svg.svg';
 
 import { auth } from '../../firebase/firebase.utilis';
@@ -21,4 +24,8 @@ const Header = ({currentUser}) => (
     </div>
 )
 
-export default Header;
+const mapStateToProps = (state) => ({
+    currentUser: state.user.currentUser
+})
+
+export default connect(mapStateToProps)(Header);//the connect will pass the whole state the each inserted parameters
